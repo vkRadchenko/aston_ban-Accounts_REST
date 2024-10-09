@@ -1,10 +1,8 @@
 package ru.radchenko.BankRestService.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,26 +15,27 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-    @NotBlank(message = "Номер счета обязателен для заполнения")
-    @Pattern(regexp = "\\d{10}", message = "Номер счета должен состоять из 10 цифр")
     @Column(name = "account_number", nullable = false, unique = true)
     private String accountNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transaction> transactions = new ArrayList<>();
+
+    @Column(name = "balance", nullable = false)
+    private  Double balance = 0.0;
 
     public Account() {
     }
     public Account(String accountNumber, User user) {
         this.accountNumber = accountNumber;
         this.user = user;
+        this.balance = 0.0;
     }
-
 
     public Long getId() {
         return id;
@@ -63,10 +62,16 @@ public class Account {
         transactions.add(transaction);
         transaction.setAccount(this);
     }
-
     public void removeTransaction(Transaction transaction) {
         transactions.remove(transaction);
         transaction.setAccount(null);
+    }
+
+    public Double getBalance() {
+        return balance;
+    }
+    public void setBalance(Double balance) {
+        this.balance = balance;
     }
 
     @Override
@@ -85,7 +90,6 @@ public class Account {
     }
 
     // Переопределение метода toString
-
     @Override
     public String toString() {
         return "Account{" +
