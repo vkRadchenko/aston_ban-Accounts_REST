@@ -6,5 +6,6 @@ public enum TransactionType {
 //  Снятие средств
     WITHDRAWAL,
 //  Перевод средств между счетами
-    TRANSFER
+    TRANSFER_OUT,
+    TRANSFER_TO
 }
