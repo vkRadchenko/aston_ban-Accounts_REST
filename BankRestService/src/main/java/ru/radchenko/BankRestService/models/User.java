@@ -20,16 +20,15 @@ public class User {
     private String name;
 
     @NotBlank(message = "Пин-код обязателен для заполнения")
-    @Pattern(regexp = "\\d{4}", message = "Пин-код должен состоять из четырех цифр")
     @Column(name = "password", nullable = false)
-    private Integer password;
+    private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Account> accounts = new ArrayList<>();
 
     public User() {
     }
-    public User(String name, Integer password) {
+    public User(String name, String password) {
         this.name = name;
         this.password = password;
     }
@@ -48,10 +47,15 @@ public class User {
         this.name = name;
     }
 
-    public Integer getPassword() {
+    public String getPassword() {
         return password;
     }
-    public void  Integer (Integer password) {
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void  Integer (String password) {
         this.password = password;
     }
 
@@ -87,10 +91,10 @@ public class User {
 
     @Override
     public String toString() {
-        return "Recipient{" +
+        return "User{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", pinCode='****'" + //
+                ", password=" +password + //
                 '}';
     }
 
