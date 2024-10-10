@@ -1,6 +1,5 @@
 package ru.radchenko.BankRestService.controllers;
 
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -18,7 +17,7 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserRestController {
 
-    private UserService userService;
+    private final UserService userService;
 
     public UserRestController(UserService userService) {
         this.userService = userService;

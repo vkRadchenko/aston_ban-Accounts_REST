@@ -8,23 +8,17 @@ import ru.radchenko.BankRestService.events.UserCreatedEvent;
 import ru.radchenko.BankRestService.models.User;
 import ru.radchenko.BankRestService.repositories.UserRepository;
 
-import java.util.List;
-
 @Service
 @Transactional(readOnly = true)
 public class UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
     public UserService(UserRepository userRepository, ApplicationEventPublisher eventPublisher) {
         this.userRepository = userRepository;
         this.eventPublisher = eventPublisher;
-    }
-
-    public List<User> getAllRecipients() {
-        return userRepository.findAll();
     }
 
     public User getUserById(Long id){
