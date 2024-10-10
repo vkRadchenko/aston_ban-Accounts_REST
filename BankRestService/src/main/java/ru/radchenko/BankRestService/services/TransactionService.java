@@ -1,6 +1,7 @@
 package ru.radchenko.BankRestService.services;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.radchenko.BankRestService.exceptions.ResourceNotFoundException;
 import ru.radchenko.BankRestService.models.Transaction;
 import ru.radchenko.BankRestService.repositories.TransactionRepository;
@@ -8,8 +9,9 @@ import ru.radchenko.BankRestService.repositories.TransactionRepository;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class TransactionService {
-    private TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
 
     public TransactionService(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
@@ -27,6 +29,4 @@ public class TransactionService {
     public List<Transaction> getTransactionsByAccountId(Long accountNumber) {
         return transactionRepository.findByAccountId(accountNumber);
     }
-
-
 }

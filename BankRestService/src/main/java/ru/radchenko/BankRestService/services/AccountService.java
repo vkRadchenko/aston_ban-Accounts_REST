@@ -1,8 +1,8 @@
 package ru.radchenko.BankRestService.services;
 
-import org.springframework.context.event.EventListener;
+
 import org.springframework.stereotype.Service;
-import ru.radchenko.BankRestService.events.UserCreatedEvent;
+import org.springframework.transaction.annotation.Transactional;
 import ru.radchenko.BankRestService.exceptions.ResourceNotFoundException;
 import ru.radchenko.BankRestService.models.Account;
 import ru.radchenko.BankRestService.models.Transaction;
@@ -10,34 +10,23 @@ import ru.radchenko.BankRestService.models.TransactionType;
 import ru.radchenko.BankRestService.models.User;
 import ru.radchenko.BankRestService.repositories.AccountRepository;
 import ru.radchenko.BankRestService.repositories.TransactionRepository;
-import ru.radchenko.BankRestService.repositories.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class AccountService {
 
-    private AccountRepository accountRepository;
-    private UserRepository userRepository;
-    private TransactionRepository transactionRepository;
+    private final   AccountRepository accountRepository;
+    private final   TransactionRepository transactionRepository;
 
-    public AccountService(AccountRepository accountRepository, UserRepository userRepository, TransactionRepository transactionRepository) {
+    public AccountService(AccountRepository accountRepository, TransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
-        this.userRepository = userRepository;
+
         this.transactionRepository = transactionRepository;
     }
 
-    public List<Account> getAllAccounts() {
-        return accountRepository.findAll();
-    }
-
-    public Optional<Account> getAccountById(Long id) {
-        return accountRepository.findById(id);
-    }
-
+    @Transactional()
     public Account deposit(String accountNumber, Double amount) {
         Account account = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Счет не найден с accountNumber " + accountNumber));
@@ -55,7 +44,7 @@ public class AccountService {
 
         return accountRepository.save(account);
     }
-
+    @Transactional()
     public Account withdraw(String accountNumber, Double amount, String password){
         Account account = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Счет не найден с accountNumber " + accountNumber));
@@ -85,7 +74,7 @@ public class AccountService {
                 .orElseThrow(() -> new ResourceNotFoundException("Счет не найден с id " + accountNumber));
         return account.getBalance();
     }
-
+    @Transactional()
     public void transfer(String fromAccountNumber,String toAccountNumber,Double amount, String password ){
         if (fromAccountNumber.equals(toAccountNumber)) {
             throw new IllegalArgumentException("Исходный и целевой счета не должны совпадать");
@@ -129,15 +118,7 @@ public class AccountService {
 
     }
 
-    @EventListener
-    private String autoCreateAccountToFirstAuthorization(UserCreatedEvent event){
-        System.out.println(event);
-        User user = userRepository.findById(event.userId()).orElseThrow(() -> new RuntimeException("Получатель не найден с ID: " + event.userId()));
-        Account account = createAccount(user);
-
-        return account.getAccountNumber();
-    }
-
+    @Transactional
     public Account createAccount(User user){
 
         String accountNumber =  generateUniqueAccountNumber();
